@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GRK Tutorial 3 - Drawing algorithms</title>
+    <style>
+        body {background: #ccc;}
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <script>
+        let lastX = -1, lastY = -1;
+
+        function setup() {
+            createCanvas(512, 512);
+            pixelDensity(1);
+            background(255);
+            noSmooth();
+        }
+
+        function mouseDragged() {
+            if (mouseButton != LEFT) return;
+            if (lastX >= 0) {
+                line(lastX, lastY, mouseX, mouseY);
+            }
+            lastX = mouseX;
+            lastY = mouseY;
+        }
+
+        function mouseReleased() {
+            lastX = lastY = -1;
+            if(mouseButton == RIGHT) {
+                loadPixels();
+                flood_fill(mouseX, mouseY);
+                updatePixels();
+            }
+        }
+
+        function set_pixel(x, y, c) {
+            const idx = (y * 512 + x) * 4;
+            pixels[idx] = c;
+            pixels[idx+1] = c;
+            pixels[idx+2] = c;
+            pixels[idx+3] = 255;
+        }
+
+        function get_pixel(x, y) {
+            const idx = (y * 512 + x) * 4;
+            return pixels[idx];
+        }
+
+        function flood_fill(sx, sy) {
+            sx = Math.round(sx);
+            sy = Math.round(sy);
+
+            const stack = [[sx, sy]];
+            while (stack.length) {
+
+                const [x, y] = stack.pop();
+                if (x < 0 || y < 0 || x >= 512 || y >= 512) continue;
+                if (get_pixel(x, y) < 255) continue;
+
+                set_pixel(x, y, 128);
+                stack.push([x + 1, y]);
+                stack.push([x - 1, y]);
+                stack.push([x, y + 1]);
+                stack.push([x, y - 1]);
+            }
+        }
+    </script>
+</head>
+<body>
+
+</body>
+</html>
